@@ -6,8 +6,9 @@ import dspy
 import wikipedia
 from dotenv import load_dotenv
 
+
 class FutureTimeline(dspy.Signature):
-    """Generate a realistic chronological timeline related to the scenario or topic from the starting date to the foreseeable future"""
+    """Generate a realistic chronological timeline related to the scenario or topic from the current date to the foreseeable future"""
 
     timeline_scenario: str = dspy.InputField()
     contexts: list[str] = dspy.InputField()
@@ -25,7 +26,7 @@ class TimelineImplication(dspy.Signature):
     )
 
 
-def run_model(model, contexts):
+def run_model(model, scenario, contexts, current_date, final_question):
     dspy.configure(lm=dspy.LM(model))
     temps = [0.1, 0.3, 0.5, 0.7, 0.9]
     rval = []
@@ -36,12 +37,10 @@ def run_model(model, contexts):
             )
             question_answering = dspy.ChainOfThought(TimelineImplication, temperature=0)
 
-            final_question = "Russia x Ukraine ceasefire by end of 2026?"
-
             timeline = timeline_prediction(
-                timeline_scenario="Russia/Ukraine conflict",
+                timeline_scenario=scenario,
                 contexts=contexts,
-                current_date="2025-11-25",
+                current_date=current_date,
             )
             timeline_implication = question_answering(
                 timeline=timeline.simulated_timeline, question_to_answer=final_question
@@ -62,13 +61,7 @@ def run_model(model, contexts):
 
 
 def main():
-    models = [
-        "openrouter/anthropic/claude-opus-4.5",
-        "openrouter/openrouter/bert-nebulon-alpha",
-        "openrouter/x-ai/grok-4.1-fast:free",
-        "openrouter/google/gemini-3-pro-preview",
-        "openrouter/openai/gpt-5.1",
-    ]
+    scenario = "Russia/Ukraine conflict"
     context_page_titles = [
         "Timeline of the Russo-Ukrainian war (1 September 2025 – present)",
         "Peace negotiations in the Russo-Ukrainian war (2022–present)",
@@ -78,8 +71,26 @@ def main():
         page = wikipedia.page(page_title)
         context = page.title + "\n" + page.content
         contexts.append(context)
+    current_date = "2025-11-25"
+    final_question = "Russia x Ukraine ceasefire by end of 2026?"
+
+    models = [
+        "openrouter/anthropic/claude-opus-4.5",
+        "openrouter/openrouter/bert-nebulon-alpha",
+        "openrouter/x-ai/grok-4.1-fast:free",
+        "openrouter/google/gemini-3-pro-preview",
+        "openrouter/openai/gpt-5.1",
+    ]
+    prediction_function = partial(
+        run_model,
+        scenario=scenario,
+        contexts=contexts,
+        current_date=current_date,
+        final_question=final_question,
+    )
+
     with Pool(processes=len(models)) as pool:
-        processed = pool.map(partial(run_model, contexts=contexts), models)
+        processed = pool.map(prediction_function, models)
         for model_results in processed:
             for result in model_results:
                 print(json.dumps(result))

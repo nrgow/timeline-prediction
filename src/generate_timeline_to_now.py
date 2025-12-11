@@ -64,7 +64,11 @@ class MergeTimelines(dspy.Signature):
     )
 
 
-def generate_timeline_to_now(topic_pertaining_to: str, time_until="2025-12-02", model="openrouter/x-ai/grok-4.1-fast:free"):
+def generate_timeline_to_now(
+    topic_pertaining_to: str,
+    time_until="2025-12-02",
+    model="openrouter/x-ai/grok-4.1-fast:free",
+):
     dspy.configure(lm=dspy.LM(model))
 
     wiki = tools.CachedWikipedia()

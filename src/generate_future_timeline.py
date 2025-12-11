@@ -62,7 +62,6 @@ def run_model(model, scenario, contexts, current_date, final_question):
 def generate_future_timeline(
     scenario: str, wiki_context_pages: list[str], current_date: str, final_question: str
 ):
-
     contexts = []
     for page_title in wiki_context_pages:
         page = wikipedia.page(page_title)
@@ -90,4 +89,4 @@ def generate_future_timeline(
         for model_results in processed:
             for result in model_results:
                 results.append(result)
-    return results                
+    return results

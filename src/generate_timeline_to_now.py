@@ -64,8 +64,7 @@ class MergeTimelines(dspy.Signature):
     )
 
 
-def generate_timeline_to_now(topic_pertaining_to: str, time_until="2025-12-02"):
-    model = "openrouter/x-ai/grok-4.1-fast:free"
+def generate_timeline_to_now(topic_pertaining_to: str, time_until="2025-12-02", model="openrouter/x-ai/grok-4.1-fast:free"):
     dspy.configure(lm=dspy.LM(model))
 
     wiki = tools.CachedWikipedia()
@@ -132,15 +131,3 @@ def generate_timeline_to_now(topic_pertaining_to: str, time_until="2025-12-02"):
         "merged": merged.toDict(),
     }
     return output
-    #with open("output.json", "w") as o:
-    #    print(json.dumps(output), file=o)
-
-
-def main():
-    run("Recent German rearmament plans")
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    logging.basicConfig(level=logging.INFO)
-    main()

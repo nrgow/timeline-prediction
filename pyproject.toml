@@ -8,4 +8,8 @@ dependencies = [
     "dspy>=3.0.4",
     "python-dotenv>=1.2.1",
     "wikipedia>=1.4.0",
+    "requests>=2.32.3",
+    "markdownify>=1.2.2",
+    "ipython>=9.7.0",
+    "sqlitedict>=2.1.0",
 ]
